@@ -7,10 +7,11 @@ namespace tar.BlazorInput.Components.Fragments {
 
     }
 
-    public FragmentNode(string id, FragmentNode? parent, string content) {
+    public FragmentNode(string id, FragmentNode? parent, string content, bool bold = false) {
       Content = content;
       Id      = id;
       Parent  = parent;
+      SetBold = bold;
     }
     #endregion
     #region --- fields ----------------------------------------------------------------------------
@@ -46,7 +47,7 @@ namespace tar.BlazorInput.Components.Fragments {
       bool succeeded = false;
 
       var currentNode = node;
-      while (!succeeded) {
+      while (currentNode is not null && !succeeded) {
         try {
           currentNode.StateHasChanged();
           succeeded = true;

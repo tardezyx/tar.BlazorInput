@@ -9,14 +9,15 @@ using tar.BlazorInput.Components.Fragments;
 namespace tar.BlazorInput.Models {
   public class DomRange : INPC {
     #region --- fields ----------------------------------------------------------------------------
-    private FragmentNode? _editor;
-    private string        _endId       = string.Empty;
-    private int           _endOffset   = 0;
-    private string        _focusId     = string.Empty;
-    private int           _focusOffset = 0;
-    private IJSRuntime?   _jsRuntime;
-    private string        _startId     = string.Empty;
-    private int           _startOffset = 0;
+    private FragmentNode?          _editor;
+    private string                 _endId       = string.Empty;
+    private int                    _endOffset   = 0;
+    private string                 _focusId     = string.Empty;
+    private int                    _focusOffset = 0;
+    private JsonSerializerOptions? _jsonOptions;
+    private IJSRuntime?            _jsRuntime;
+    private string                 _startId     = string.Empty;
+    private int                    _startOffset = 0;
     #endregion
     #region --- properties ------------------------------------------------------------------------
     public string EndId       { get { return _endId;       } set { SetField(ref _endId,       value); } }
@@ -33,17 +34,16 @@ namespace tar.BlazorInput.Models {
     #endregion
 
     #region --- extract to bold -------------------------------------------------------------------
-    internal void ExtractToBold(FragmentNode node, int start, int end) {
+    internal static void ExtractToBold(FragmentNode node, int start, int end) {
       string content = node.Content[start..end];
-      node.Content = node.Content[..start];
+      node.UpdateContent(node.Content[..start]);
 
       FragmentNode newNode = new(
         Guid.NewGuid().ToString(),
         node,
-        content
-      ) {
-        SetBold = true
-      };
+        content,
+        true
+      );
 
       node.AddChildren(newNode);
     }
@@ -142,7 +142,7 @@ namespace tar.BlazorInput.Models {
         string prefix = StartNode.Content[..StartOffset];
         string suffix = StartNode.Content[EndOffset..];
         int    newPos = StartOffset;
-        StartNode.Content = prefix + suffix;
+        StartNode.UpdateContent(prefix + suffix);
 
         // set position to original offset
         await SetPosition(StartNode, newPos);
@@ -182,18 +182,20 @@ namespace tar.BlazorInput.Models {
         return;
       }
 
-      TextEncoderSettings encoderSettings = new();
-        encoderSettings.AllowCharacters('\'');
-        encoderSettings.AllowRange(UnicodeRanges.All);
+      if (_jsonOptions is null) {
+        TextEncoderSettings encoderSettings = new();
+          encoderSettings.AllowCharacters('\'');
+          encoderSettings.AllowRange(UnicodeRanges.All);
 
-      JsonSerializerOptions jsonOptions = new() {
-        Converters = {
-          new JsonStringEnumConverter()
-        },
-        Encoder = JavaScriptEncoder.Create(encoderSettings),
-        PropertyNameCaseInsensitive = true,
-        WriteIndented = true
-      };
+        _jsonOptions = new() {
+          Converters = {
+            new JsonStringEnumConverter()
+          },
+          Encoder = JavaScriptEncoder.Create(encoderSettings),
+          PropertyNameCaseInsensitive = true,
+          WriteIndented = true
+        };
+      }
 
       const string js = @"export function GetRange() {
         let selection = window.getSelection();
@@ -224,7 +226,7 @@ namespace tar.BlazorInput.Models {
 
       if (
         await jsObject.InvokeAsync<JsonElement>("GetRange") is JsonElement jsonElement
-        && JsonSerializer.Deserialize<DomRange>(jsonElement, jsonOptions) is DomRange domRange
+        && JsonSerializer.Deserialize<DomRange>(jsonElement, _jsonOptions) is DomRange domRange
       ) {
         EndId       = domRange.EndId;
         EndOffset   = domRange.EndOffset;

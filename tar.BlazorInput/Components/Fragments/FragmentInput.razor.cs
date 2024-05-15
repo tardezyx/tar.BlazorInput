@@ -88,7 +88,7 @@ namespace tar.BlazorInput.Components.Fragments {
     }
     #endregion
     #region --- handle special key ----------------------------------------------------------------
-    private static async Task<bool> HandleSpecialKey(string key) {
+    private static bool HandleSpecialKey(string key) {
       List<string> keys = [
         "Backspace",
         "Delete",
@@ -131,7 +131,7 @@ namespace tar.BlazorInput.Components.Fragments {
 
       await _range.RemoveRange();
 
-      if (await HandleSpecialKey(e.Key)) {
+      if (HandleSpecialKey(e.Key)) {
         return;
       }
 
