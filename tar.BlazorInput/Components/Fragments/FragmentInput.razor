@@ -1,0 +1,15 @@
+﻿@using System.Text.Json
+@using System.Text.Encodings.Web
+@using System.Text.Unicode
+@using System.Text.Json.Serialization
+@using Microsoft.AspNetCore.Http.Json
+@using tar.BlazorInput.Models
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
+<button @onclick="_range.FormatBold">Fatmaker</button><br />
+
+<div id="inputEditor" style="border: 1pt solid grey; padding:4px;" tabindex="1" contenteditable="true"
+     @ref=_inputReference @onkeydown="e => OnKeyDown(e)" @onkeydown:preventDefault="true" @onkeydown:stopPropagation="true">
+  <FragmentNode @ref=_inputFragmentNode />
+</div>

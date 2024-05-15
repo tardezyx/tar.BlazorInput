@@ -1,0 +1,15 @@
+﻿<div id="@Id" class="inline @_class" @ref=_reference>
+  @Content
+  @foreach (FragmentNode child in Children) {
+    <FragmentNode Children="@child.Children"
+                  Content="@child.Content"
+                  Id="@child.Id"
+                  SetBold="@child.SetBold"
+                  SetCode="@child.SetCode"
+                  SetCodeblock="@child.SetCodeblock"
+                  SetItalic="@child.SetItalic"
+                  SetLink="@child.SetLink"
+                  SetQuote="@child.SetQuote"
+                  Parent="@child.Parent" />
+  }
+</div>

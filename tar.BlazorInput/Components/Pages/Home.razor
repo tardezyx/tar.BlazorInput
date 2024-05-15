@@ -1,0 +1,9 @@
+﻿@using tar.BlazorInput.Components.Fragments
+@page "/"
+@rendermode InteractiveServer
+
+<FragmentInput @ref=_input />
+
+@code {
+  private FragmentInput _input = new();
+}
