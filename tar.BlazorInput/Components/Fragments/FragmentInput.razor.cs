@@ -5,56 +5,65 @@ using tar.BlazorInput.Models;
 namespace tar.BlazorInput.Components.Fragments {
   public partial class FragmentInput {
     #region --- fields ----------------------------------------------------------------------------
-    private          ElementReference _inputReference;
     private          FragmentNode     _inputFragmentNode = new("editor", null, string.Empty);
+    #pragma warning disable IDE0052 // reference not recognized by IDE
+    private          ElementReference _inputReference;
+    #pragma warning restore IDE0052
+    private          List<string>     _keysIgnorable     = [];
+    private          List<string>     _keysNavigation    = [];
+    private          List<string>     _keysSpecial       = [];
     private readonly DomRange         _range             = new();
     #endregion
 
     #region --- handle ignorable key --------------------------------------------------------------
-    private static bool HandleIgnorableKey(string key) {
-      List<string> keys = [
-        "Alt",
-        "AltGraph",
-        "Clear",
-        "ContextMenu",
-        "Control",
-        "Dead",
-        "Escape",
-        "F1",
-        "F2",
-        "F3",
-        "F4",
-        "F5",
-        "F6",
-        "F7",
-        "F8",
-        "F9",
-        "F10",
-        "F11",
-        "F12",
-        "Insert",
-        "NumLock",
-        "OS",
-        "PageDown",
-        "PageUp",
-        "Pause",
-        "ScrollLock",
-        "Shift",
-      ];
+    private bool HandleIgnorableKey(string key) {
+      if (_keysIgnorable.Count == 0) {
+        _keysIgnorable = [
+          "Alt",
+          "AltGraph",
+          "Clear",
+          "ContextMenu",
+          "Control",
+          "Dead",
+          "Escape",
+          "F1",
+          "F2",
+          "F3",
+          "F4",
+          "F5",
+          "F6",
+          "F7",
+          "F8",
+          "F9",
+          "F10",
+          "F11",
+          "F12",
+          "Insert",
+          "NumLock",
+          "OS",
+          "PageDown",
+          "PageUp",
+          "Pause",
+          "ScrollLock",
+          "Shift",
+        ];
+      }
 
-      return keys.Contains(key);
+      return _keysIgnorable.Contains(key);
     }
     #endregion
     #region --- handle navigation key -------------------------------------------------------------
     private async Task<bool> HandleNavigationKey(KeyboardEventArgs e) {
-      List<string> keys = [
-        "ArrowDown",
-        "ArrowLeft",
-        "ArrowRight",
-        "ArrowUp",
-        "End",
-        "Home"
-      ];
+      if (_keysNavigation.Count == 0) {
+        _keysNavigation = [
+          "ArrowDown",
+          "ArrowLeft",
+          "ArrowRight",
+          "ArrowUp",
+          "End",
+          "Home"
+        ];
+      }
 
       if (e.Key.Equals("ArrowDown")) {
       }
@@ -84,17 +93,19 @@ namespace tar.BlazorInput.Components.Fragments {
       if (e.Key.Equals("Home")) {
       }
 
-      return keys.Contains(e.Key);
+      return _keysNavigation.Contains(e.Key);
     }
     #endregion
     #region --- handle special key ----------------------------------------------------------------
-    private static bool HandleSpecialKey(string key) {
-      List<string> keys = [
-        "Backspace",
-        "Delete",
-        "Enter",
-        "Tab"
-      ];
+    private bool HandleSpecialKey(string key) {
+      if (_keysSpecial.Count == 0) {
+        _keysSpecial = [
+          "Backspace",
+          "Delete",
+          "Enter",
+          "Tab"
+        ];
+      }
 
       if (key.Equals("Backspace")) {
       }
@@ -109,7 +120,7 @@ namespace tar.BlazorInput.Components.Fragments {
 
       }
 
-      return keys.Contains(key);
+      return _keysSpecial.Contains(key);
     }
     #endregion
     #region --- on after render -------------------------------------------------------------------
@@ -137,7 +148,7 @@ namespace tar.BlazorInput.Components.Fragments {
 
       await _range.InsertText(e.Key);
 
-      StateHasChanged();
+      //StateHasChanged();
     }
     #endregion
   }

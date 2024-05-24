@@ -16,7 +16,9 @@ namespace tar.BlazorInput.Components.Fragments {
     #endregion
     #region --- fields ----------------------------------------------------------------------------
     private string _class = string.Empty;
+    #pragma warning disable IDE0052 // reference not recognized by IDE
     private ElementReference _reference;
+    #pragma warning restore IDE0052
     // private RenderFragment   _renderFragment = builder => { builder.AddContent(0, string.Empty); };
     #endregion
     #region --- properties ------------------------------------------------------------------------
@@ -44,17 +46,7 @@ namespace tar.BlazorInput.Components.Fragments {
     internal void AddChildren(FragmentNode node) {
       Children.Add(node);
       node.CheckFormats();
-      bool succeeded = false;
-
-      var currentNode = node;
-      while (currentNode is not null && !succeeded) {
-        try {
-          currentNode.StateHasChanged();
-          succeeded = true;
-        } catch {
-          currentNode = currentNode.Parent;
-        }
-      }
+      Refresh();
     }
     #endregion
     #region --- check formats ---------------------------------------------------------------------
@@ -177,10 +169,25 @@ namespace tar.BlazorInput.Components.Fragments {
       // };
     }
     #endregion
+    #region --- refresh ---------------------------------------------------------------------------
+    internal void Refresh() {
+      bool succeeded = false;
+      FragmentNode? currentNode = this;
+
+      while (currentNode is not null && !succeeded) {
+        try {
+          currentNode.StateHasChanged();
+          succeeded = true;
+        } catch {
+          currentNode = currentNode.Parent;
+        }
+      }
+    }
+    #endregion
     #region --- update content --------------------------------------------------------------------
     internal void UpdateContent(string content) {
       Content = content;
-      Parent?.StateHasChanged();
+      Refresh();
     }
     #endregion
   }

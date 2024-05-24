@@ -7,7 +7,7 @@ using System.Text.Unicode;
 using tar.BlazorInput.Components.Fragments;
 
 namespace tar.BlazorInput.Models {
-  public class DomRange : INPC {
+  public class DomRange : NPC {
     #region --- fields ----------------------------------------------------------------------------
     private FragmentNode?          _editor;
     private string                 _endId       = string.Empty;
@@ -34,24 +34,37 @@ namespace tar.BlazorInput.Models {
     #endregion
 
     #region --- extract to bold -------------------------------------------------------------------
-    internal static void ExtractToBold(FragmentNode node, int start, int end) {
-      string content = node.Content[start..end];
-      node.UpdateContent(node.Content[..start]);
+    internal void ExtractToBold(FragmentNode node, int start, int end) {
+      string prefix  = node.Content[..start];
+      string extract = node.Content[start..end];
+      string suffix  = node.Content[end..];
+      node.UpdateContent(prefix);
 
-      FragmentNode newNode = new(
+      FragmentNode extractNode = new(
         Guid.NewGuid().ToString(),
         node,
-        content,
+        extract,
         true
       );
 
-      node.AddChildren(newNode);
+      node.AddChildren(extractNode);
+
+      FragmentNode suffixNode = new(
+        Guid.NewGuid().ToString(),
+        node,
+        suffix,
+        false
+      );
+
+      node.AddChildren(suffixNode);
     }
     #endregion
     #region --- format bold -----------------------------------------------------------------------
-    internal void FormatBold() {
+    internal async Task FormatBold() {
+      await Update();
+
       if (StartNode is not null && !StartNode.IsBold) {
-        ExtractToBold(StartNode, StartOffset, StartNode.Content.Length -1);
+        ExtractToBold(StartNode, StartOffset, EndOffset);
       }
     }
     #endregion

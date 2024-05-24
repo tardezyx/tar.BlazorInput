@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 
 namespace tar.BlazorInput.Models {
-  public class INPC: INotifyPropertyChanged {
+  public class NPC: INotifyPropertyChanged {
     #region --- events ----------------------------------------------------------------------------
     public event PropertyChangedEventHandler? PropertyChanged;
     #endregion
